@@ -27,6 +27,7 @@ type Info struct {
 	Size              int64   `json:"size"`
 	State             string  `json:"state"`
 	Tags              string  `json:"tags"`
+	TotalSize         int64   `json:"total_size"`
 	Tracker           string  `json:"tracker"`
 	TimeActive        int64   `json:"time_active"`
 	Uploaded          int64   `json:"uploaded"`

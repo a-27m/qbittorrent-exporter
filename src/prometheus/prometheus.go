@@ -70,6 +70,7 @@ const (
 	torrentLabelTimeActive             string = "time_active"
 	torrentLabelTorrents               string = "torrents"
 	torrentLabelTotalDownloaded        string = "total_downloaded_bytes"
+	torrentLabelTotalSizeBytes         string = "total_size_bytes"
 	torrentLabelTotalUploaded          string = "total_uploaded_bytes"
 	torrentLabelTracker                string = "tracker"
 	torrentLabelTransfer               string = "transfer"
@@ -180,6 +181,7 @@ func createTorrentLabels(torrent API.Info, enableHighCardinality, enableLabelWit
 
 	if enableHighCardinality {
 		infoLabels[torrentLabelSize] = strconv.FormatInt(torrent.Size, 10)
+		infoLabels[torrentLabelTotalSizeBytes] = strconv.FormatInt(torrent.TotalSize, 10)
 		infoLabels[torrentLabelProgress] = strconv.FormatFloat(torrent.Progress, 'f', 4, 64)
 		infoLabels[labelSeeders] = strconv.FormatInt(torrent.NumSeeds, 10)
 		infoLabels[torrentLabelLeechers] = strconv.FormatInt(torrent.NumLeechs, 10)
@@ -216,6 +218,7 @@ func Torrent(result *API.SliceInfo, webUIVersion *string, r *prometheus.Registry
 		torrentRatio             = createMetricName(metricNameTorrent, torrentLabelRatio)
 		torrentAmountLeft        = createMetricName(metricNameTorrent, torrentLabelAmountLeftBytes)
 		torrentSize              = createMetricName(metricNameTorrent, torrentLabelSizeBytes)
+		torrentTotalSize         = createMetricName(metricNameTorrent, torrentLabelTotalSizeBytes)
 		torrentSessionDownloaded = createMetricName(metricNameTorrent, torrentLabelSessionDownloadedBytes)
 		torrentSessionUploaded   = createMetricName(metricNameTorrent, torrentLabelSessionUploadedBytes)
 		torrentTotalDownloaded   = createMetricName(metricNameTorrent, torrentLabelTotalDownloaded)
@@ -255,6 +258,7 @@ func Torrent(result *API.SliceInfo, webUIVersion *string, r *prometheus.Registry
 		{&torrentRatio, nil, "The current ratio of each torrent", &labels},
 		{&torrentAmountLeft, &Bytes, "The amount remaining for each torrent", &labels},
 		{&torrentSize, &Bytes, "The size of each torrent", &labels},
+		{&torrentTotalSize, &Bytes, "The total size of each torrent, including unselected files", &labels},
 		{&torrentSessionDownloaded, &Bytes, "The current session download amount of torrents", &labels},
 		{&torrentSessionUploaded, &Bytes, "The current session upload amount of torrents", &labels},
 		{&torrentTotalDownloaded, &Bytes, "The current total download amount of torrents", &labels},
@@ -334,6 +338,7 @@ func Torrent(result *API.SliceInfo, webUIVersion *string, r *prometheus.Registry
 		metrics[torrentRatio].With(torrentLabels).Set(float64(torrent.Ratio))
 		metrics[torrentAmountLeft].With(torrentLabels).Set(float64(torrent.AmountLeft))
 		metrics[torrentSize].With(torrentLabels).Set(float64(torrent.Size))
+		metrics[torrentTotalSize].With(torrentLabels).Set(float64(torrent.TotalSize))
 		metrics[torrentSessionDownloaded].With(torrentLabels).Set(float64(torrent.DownloadedSession))
 		metrics[torrentSessionUploaded].With(torrentLabels).Set(float64(torrent.UploadedSession))
 		metrics[torrentTotalDownloaded].With(torrentLabels).Set(float64(torrent.Downloaded))
